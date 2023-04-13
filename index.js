@@ -7,8 +7,8 @@ const albums = [
     name: "The Record",
     artist: "Boygenius",
     year: 2023,
-    genre: "Alternative",
-    mood: ["Melancholic", "Sad", "Romantic"],
+    genre: "alternative",
+    mood: ["melancholic", "sad", "romantic"],
     cover:
       "https://www.mondosonoro.com/wp-content/uploads/2023/04/boygenius-the-record.jpg",
   },
@@ -16,8 +16,8 @@ const albums = [
     name: "This is Why",
     artist: "Paramore",
     year: 2023,
-    genre: "Rock",
-    mood: ["Angst", "Powerful", "Romantic"],
+    genre: "rock",
+    mood: ["angst", "powerful", "romantic"],
     cover:
       "https://m.media-amazon.com/images/W/IMAGERENDERING_521856-T1/images/I/91T8oKMkowL._SL1500_.jpg",
   },
@@ -25,8 +25,8 @@ const albums = [
     name: "Preacher's Daughter",
     artist: "Ethel Cain",
     year: 2022,
-    genre: "Alternative",
-    mood: ["Sad", "Melancholic", "Dark"],
+    genre: "alternative",
+    mood: ["sad", "melancholic", "dark"],
     cover:
       "https://media.pitchfork.com/photos/627c0ad088edeb4d342d9258/1:1/w_600/Ethel-Cain-Preachers-Daughter-2022.jpg",
   },
@@ -34,16 +34,16 @@ const albums = [
     name: "Midnights",
     artist: "Taylor Swift",
     year: 2022,
-    genre: "Pop",
-    mood: ["Romantic", "Melancholic", "Energetic"],
+    genre: "pop",
+    mood: ["romantic", "melancholic", "energetic"],
     cover: "https://i.scdn.co/image/ab67616d0000b273bb54dde68cd23e2a268ae0f5",
   },
   {
     name: "Rhythm of Love",
     artist: "Kylie Minogue",
     year: 1990,
-    genre: "Pop",
-    mood: ["Happy", "Romantic", "Energetic"],
+    genre: "pop",
+    mood: ["happy", "romantic", "energetic"],
     cover: "",
   },
 ];
@@ -116,14 +116,46 @@ app.get("/filterGenre", (req, res) => {
   };
 
   if (genre === "rock") {
-    makeFilteredAlbumsArray("rock");
+    makeFilteredAlbumsArray(genre);
+    res.send(filteredAlbums);
+  } else if (genre === "alternative") {
+    makeFilteredAlbumsArray(genre);
+    res.send(filteredAlbums);
+  } else if (genre === "pop") {
+    makeFilteredAlbumsArray(genre);
     res.send(filteredAlbums);
   } else {
     res.send(`Sorry, we don't have any ${genre} albums :(`);
   }
 });
 
-app.get("/filterMood", (req, res) => {});
+app.get("/filterMood", (req, res) => {
+  const mood = req.query.mood;
+  const filteredAlbums = [];
+  const makeFilteredAlbumsArray = (albumMood) => {
+    albums.map((album) =>
+      album.mood.map((mood) =>
+        mood === albumMood ? filteredAlbums.push(album) : null
+      )
+    );
+  };
+
+  if (mood === "happy") {
+    makeFilteredAlbumsArray(mood);
+    res.send(filteredAlbums);
+  } else if (mood === "sad") {
+    makeFilteredAlbumsArray(mood);
+    res.send(filteredAlbums);
+  } else if (mood === "energetic") {
+    makeFilteredAlbumsArray(mood);
+    res.send(filteredAlbums);
+  } else if (mood === "romantic") {
+    makeFilteredAlbumsArray(mood);
+    res.send(filteredAlbums);
+  } else {
+    res.send(`Sorry, we don't have any ${mood} albums :(`);
+  }
+});
 
 app.listen(port, () => {
   console.log(`Random Album app listening on port ${port}`);
