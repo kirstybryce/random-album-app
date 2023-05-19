@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const port = 3000;
+const port = 3001;
 
 const albums = [
   {
@@ -49,10 +49,6 @@ const albums = [
 ];
 
 // req = request, res = response
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
-
 app.get("/hello", (req, res) => {
   const name = req.query.name;
   const surname = req.query.surname;
@@ -64,6 +60,10 @@ app.get("/albums", (req, res) => {
   res.send(albums[albumId]);
 });
 
+app.get("/example", (req, res) => {
+  res.send("this is an example function");
+});
+
 app.get("/RandomAlbum", (req, res) => {
   const randomId = Math.floor(Math.random() * albums.length);
   res.send(albums[randomId]);
@@ -71,62 +71,46 @@ app.get("/RandomAlbum", (req, res) => {
 
 app.get("/filterYear", (req, res) => {
   const year = parseInt(req.query.year);
-  const filteredAlbums = [];
+  let filteredAlbums = [];
+
+  const getBounds = (year) => {
+    const lowerBound = Math.ceil(year / 10) * 10 - 10;
+    const higherBound = Math.ceil(year / 10) * 10;
+    return { lowerBound, higherBound };
+  };
+
+  const bounds = getBounds(year);
+
   const makeFilteredAlbumsArray = (bottomRange, topRange) => {
-    albums.map((album) =>
-      album.year >= bottomRange && album.year < topRange
-        ? filteredAlbums.push(album)
-        : null
+    filteredAlbums = albums.filter(
+      (album) => album.year >= bottomRange && album.year < topRange
     );
   };
 
-  if (year >= 1950 && year < 1960) {
-    makeFilteredAlbumsArray(1950, 1960);
-    res.send(filteredAlbums);
-  } else if (year >= 1960 && year < 1970) {
-    makeFilteredAlbumsArray(1960, 1970);
-    res.send(filteredAlbums);
-  } else if (year >= 1970 && year < 1980) {
-    makeFilteredAlbumsArray(1970, 1980);
-    res.send(filteredAlbums);
-  } else if (year >= 1980 && year < 1990) {
-    makeFilteredAlbumsArray(1980, 1990);
-    res.send(filteredAlbums);
-  } else if (year >= 1990 && year < 2000) {
-    makeFilteredAlbumsArray(1990, 2000);
-    res.send(filteredAlbums);
-  } else if (year >= 2000 && year < 2010) {
-    makeFilteredAlbumsArray(2000, 2010);
-    res.send(filteredAlbums);
-  } else if (year >= 2020 && year < 2030) {
-    makeFilteredAlbumsArray(2020, 2030);
-    res.send(filteredAlbums);
-  } else {
-    res.send(`Sorry, we don't have any albums from ${year} :(`);
+  makeFilteredAlbumsArray(bounds.lowerBound, bounds.higherBound);
+  if (filteredAlbums.length === 0) {
+    return res.send(`Sorry, we don't have any albums from ${year} :(`);
   }
+  res.send(filteredAlbums);
 });
 
 app.get("/filterGenre", (req, res) => {
   const genre = req.query.genre;
   const filteredAlbums = [];
   const makeFilteredAlbumsArray = (albumGenre) => {
-    albums.map((album) =>
-      album.genre === albumGenre ? filteredAlbums.push(album) : null
-    );
+    filteredAlbums = albums.filter((album) => album.genre === albumGenre);
   };
 
-  if (genre === "rock") {
-    makeFilteredAlbumsArray(genre);
-    res.send(filteredAlbums);
-  } else if (genre === "alternative") {
-    makeFilteredAlbumsArray(genre);
-    res.send(filteredAlbums);
-  } else if (genre === "pop") {
-    makeFilteredAlbumsArray(genre);
-    res.send(filteredAlbums);
-  } else {
-    res.send(`Sorry, we don't have any ${genre} albums :(`);
-  }
+  const returnAlbumsFromGenre = (albumGenre) => {
+    if (genre === albumGenre) {
+      makeFilteredAlbumsArray(albumGenre);
+      res.send(filteredAlbums);
+    }
+  };
+
+  returnAlbumsFromGenre("rock");
+  returnAlbumsFromGenre("alternative");
+  returnAlbumsFromGenre("pop");
 });
 
 app.get("/filterMood", (req, res) => {
@@ -156,6 +140,8 @@ app.get("/filterMood", (req, res) => {
     res.send(`Sorry, we don't have any ${mood} albums :(`);
   }
 });
+
+app.use(express.static("public"));
 
 app.listen(port, () => {
   console.log(`Random Album app listening on port ${port}`);
